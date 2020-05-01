@@ -129,9 +129,9 @@ public class Marriages {
                 // one another than with their current partner
                 for(int c1 = 0; c1 < wives.length; c1++){
                     for(int c2 = c1+1; c2 < wives.length; c2++){
-                        if(couplesWouldRatherSwapPertners(c1, c2)){
+                        if(couplesWouldRatherSwapPartners(c1, c2)){
 
-                            //return false;
+                            return false;
                         }
                     }
                 }
@@ -140,7 +140,7 @@ public class Marriages {
                 return true;
             }
 
-            boolean couplesWouldRatherSwapPertners(int c1, int c2){
+            boolean couplesWouldRatherSwapPartners(int c1, int c2){
                 int couple1Boy = c1;
                 int couple1Girl = wifeOfBoy(couple1Boy);
 
@@ -154,18 +154,20 @@ public class Marriages {
                        < whereDoesThisGirlLieInThisBoysPreferenceList(couple1Boy, couple1Girl))
                     &&(whereDoesThisBoyLieInThisGirlsPreferenceList(couple1Boy, couple2Girl)
                        < whereDoesThisBoyLieInThisGirlsPreferenceList(couple2Boy, couple2Girl))){
-                    return false;
+                   // throw new IllegalStateException("Marriage is not stable!");
+                    return true;
                 }
 
                 if(   (whereDoesThisGirlLieInThisBoysPreferenceList(couple2Boy, couple1Girl) 
                        < whereDoesThisGirlLieInThisBoysPreferenceList(couple2Boy, couple2Girl))
                     &&(whereDoesThisBoyLieInThisGirlsPreferenceList(couple2Boy, couple1Girl)
                        < whereDoesThisBoyLieInThisGirlsPreferenceList(couple1Boy, couple1Girl))){
-                    return false;
+                    //throw new IllegalStateException("Marriage is not stable!");
+                    return true;
                 }
 
                 // They dont have better cross affinity
-                return true;
+                return false;
             }
         }
 
@@ -203,27 +205,30 @@ public class Marriages {
 
             int nextFreeMan = m.findNextFreeMan();
             while(nextFreeMan != -1){
-                int womanProposed = m.proposeToGirl(nextFreeMan);
-                if(DEBUG)
-                    System.out.println("2. Boy " + nextFreeMan + " proposed to " + womanProposed + " whose fiancee is " + m.husbandOfGirl(womanProposed));
-                if(womanProposed == -1){
-                    if(DEBUG)
-                        System.out.println("This should never happen as there must always be a girl available");
-                    assert(false);
-                } 
-                else if(m.husbandOfGirl(womanProposed) == -1){
-                    // Girl is free, engage this couple
-                    m.wives[nextFreeMan] = womanProposed;
-                }
-                else{
-                    //Girl is already engaged
-                    // See if girl would like to break current engagement?
-                    int currentBoy = m.husbandOfGirl(womanProposed);
-                    if(whereDoesThisBoyLieInThisGirlsPreferenceList(nextFreeMan, womanProposed)
-                        < whereDoesThisBoyLieInThisGirlsPreferenceList(currentBoy, womanProposed)){
-                        // Yes she would break current engagement and re-engage
-                        m.wives[currentBoy] = -1;
+                //int womanProposed = m.proposeToGirl(nextFreeMan);
+                for(int i=0; i<m.wives.length; i++) {
+                    int womanProposed = boysPreferences[nextFreeMan][i];
+                    if (DEBUG)
+                        System.out.println("2. Boy " + nextFreeMan + " proposed to " + womanProposed + " whose fiancee is " + m.husbandOfGirl(womanProposed));
+                    if (womanProposed == -1) {
+                        if (DEBUG)
+                            System.out.println("This should never happen as there must always be a girl available");
+                        assert (false);
+                    } else if (m.husbandOfGirl(womanProposed) == -1) {
+                        // Girl is free, engage this couple
                         m.wives[nextFreeMan] = womanProposed;
+                        break;
+                    } else {
+                        //Girl is already engaged
+                        // See if girl would like to break current engagement?
+                        int currentBoy = m.husbandOfGirl(womanProposed);
+                        if (whereDoesThisBoyLieInThisGirlsPreferenceList(nextFreeMan, womanProposed)
+                                < whereDoesThisBoyLieInThisGirlsPreferenceList(currentBoy, womanProposed)) {
+                            // Yes she would break current engagement and re-engage
+                            m.wives[currentBoy] = -1;
+                            m.wives[nextFreeMan] = womanProposed;
+                            break;
+                        }
                     }
                 }
 
