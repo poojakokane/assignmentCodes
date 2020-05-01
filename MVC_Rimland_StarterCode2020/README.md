@@ -1,1 +1,1 @@
-# The sample output
+# Sample output
