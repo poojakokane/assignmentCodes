@@ -1,0 +1,6 @@
+// Input graph in the following form
+// Each line represents one graph
+// Each contains several pairs of numbers where each pair represents an edge
+1 2 2 3 3 4 4 1 1 3 2 4 4 5
+1 2 2 3 3 1
+1 3 1 4 1 2 1 5 3 5
