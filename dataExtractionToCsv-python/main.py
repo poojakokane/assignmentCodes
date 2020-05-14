@@ -22,7 +22,11 @@ def getInputOutputFileNames():
     return [inputDir, outputDir]
 
 
-def aggregateFilesAtMonthLevel(ipDirPath, opDirPath = None, maxFilesToProcess = 0, opFileName="aggregated.csv"):
+def aggregateFilesAtMonthLevel(ipDirPath,
+                               opDirPath = None,
+                               maxFilesToProcess = 0,
+                               opFileName="aggregated.csv",
+                               monthInputSanityCheck = False):
     filesToProcess = -1
 
     if opDirPath == None:
@@ -37,6 +41,11 @@ def aggregateFilesAtMonthLevel(ipDirPath, opDirPath = None, maxFilesToProcess = 
 
         for month in os.listdir(os.path.join(ipDirPath, year)):
             if not os.path.isdir(os.path.join(ipDirPath, year, month)):
+                continue
+
+            folderPath = os.path.join(ipDirPath, year, month)
+            if monthInputSanityCheck and not isNumberOfDaysFolderCorrect(folderPath):
+                print("Skipping ", folderPath, " as it does not contain enough DAY folders")
                 continue
 
             # File that contains aggregated data
@@ -81,8 +90,8 @@ def aggregateFilesAtMonthLevel(ipDirPath, opDirPath = None, maxFilesToProcess = 
 def main():
     [ipDirPath, opDirPath] = getInputOutputFileNames()
 
-    aggregateFilesAtDayLevel(ipDirPath=ipDirPath, opDirPath=opDirPath, maxFilesToProcess=3)
-    aggregateFilesAtMonthLevel(ipDirPath=ipDirPath, opDirPath=opDirPath, maxFilesToProcess=3)
+    aggregateFilesAtDayLevel(ipDirPath=ipDirPath, opDirPath=opDirPath, maxFilesToProcess=3, monthInputSanityCheck=True)
+    aggregateFilesAtMonthLevel(ipDirPath=ipDirPath, opDirPath=opDirPath, maxFilesToProcess=3, monthInputSanityCheck=True)
 
 
 def putDatainAggregateFile(utcTimeString, cstTimeString, dataRow, aggFile):
@@ -148,7 +157,28 @@ def utcTimeStringToCstTimeString(utcTimeString):
     cstTimeString = cstTime.strftime("%Y-%m-%dT%H:%M:%SZ")
     return cstTimeString
 
-def aggregateFilesAtDayLevel(ipDirPath, maxFilesToProcess=0, opFileName="aggregated.csv", opDirPath=None):
+
+def isNumberOfDaysFolderCorrect(folderPath):
+    countOfDaysFolder = 0
+
+    for day in os.listdir(folderPath):
+        if not os.path.isdir(os.path.join(folderPath, day)):
+            continue
+
+        countOfDaysFolder += 1;
+
+    if countOfDaysFolder < 28:
+        return False
+
+    return True
+
+
+
+def aggregateFilesAtDayLevel(ipDirPath,
+                             maxFilesToProcess=0,
+                             opFileName="aggregated.csv",
+                             opDirPath=None,
+                             monthInputSanityCheck=False):
     filesToProcess = -1
 
     if opDirPath == None:
@@ -163,6 +193,11 @@ def aggregateFilesAtDayLevel(ipDirPath, maxFilesToProcess=0, opFileName="aggrega
 
         for month in os.listdir(os.path.join(ipDirPath, year)):
             if not os.path.isdir(os.path.join(ipDirPath, year, month)):
+                continue
+
+            folderPath = os.path.join(ipDirPath, year, month)
+            if monthInputSanityCheck and not isNumberOfDaysFolderCorrect(folderPath):
+                print("Skipping ", folderPath, " as it does not contain enough DAY folders")
                 continue
 
             for day in os.listdir(os.path.join(ipDirPath, year, month)):
