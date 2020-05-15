@@ -90,28 +90,26 @@ def aggregateFilesAtMonthLevel(ipDirPath,
 def main():
     [ipDirPath, opDirPath] = getInputOutputFileNames()
 
-    aggregateFilesAtDayLevel(ipDirPath=ipDirPath, opDirPath=opDirPath, maxFilesToProcess=3, monthInputSanityCheck=True)
-    aggregateFilesAtMonthLevel(ipDirPath=ipDirPath, opDirPath=opDirPath, maxFilesToProcess=3, monthInputSanityCheck=True)
+    aggregateFilesAtDayLevel(ipDirPath=ipDirPath, opDirPath=opDirPath,
+                             # maxFilesToProcess=3,
+                             monthInputSanityCheck=False
+                             )
+    aggregateFilesAtMonthLevel(ipDirPath=ipDirPath, opDirPath=opDirPath,
+                               # maxFilesToProcess=3,
+                               monthInputSanityCheck=False
+                               )
 
 
 def putDatainAggregateFile(utcTimeString, cstTimeString, dataRow, aggFile):
-    dataFields = [
-        "gid",
-        "tmpc",
-        "wawa",
-        "ptype",
-        "dwpc",
-        "smps",
-        "drct",
-        "vsby",
-        "roadtmpc",
-        "srad",
-        "snwd",
-        "pcpn",
-    ]
 
     stringToPutInFile = ""
-    for dataField in dataFields:
+    for dataField in ["gid", "tmpc"]:
+        stringToPutInFile += (str(dataRow[dataField]) + ", ")
+
+    wawaString = " ".join(dataRow["wawa"])
+    stringToPutInFile += wawaString + ", "
+
+    for dataField in ["ptype", "dwpc", "smps", "drct", "vsby", "roadtmpc", "srad", "snwd", "pcpn"]:
         stringToPutInFile += (str(dataRow[dataField]) + ", ")
 
     stringToPutInFile += (utcTimeString + ", ")
