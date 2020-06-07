@@ -1,7 +1,10 @@
-#include <iostream>
-#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-using namespace::std;
+//#include <file.h>
+
+//using namespace::std;
 
 typedef struct customer{
     unsigned long inTime;
@@ -30,21 +33,21 @@ typedef struct queue{
 
 
 
-Customer *createCustomer(unsigned long time, unsigned long line, string name, unsigned int items);
+Customer *createCustomer(unsigned long time, unsigned long line, char *name, unsigned int items);
 
 void enqueue(Queue *pQueue, Customer *pCustomer);
 
-bool empty(Queue queue);
+int queueEmpty(Queue queue);
 
-void runSimulation(queue *pQueue, FILE *pFile);
+void runSimulation(Queue *pQueue, FILE *pFile);
 
-Customer *getNextCustomer(queue *pQueue, unsigned long *currTime);
+Customer *getNextCustomer(Queue *pQueue, unsigned long *currTime);
 
 void checkoutCustomer(Customer *pCustomer, unsigned long *currTime);
 
-Customer *getCustomerWithMinInTime(queue *pQueue);
+Customer *getCustomerWithMinInTime(Queue *pQueue);
 
-Customer *getCustomerWithinTimeWithMinItems(queue *pQueue, unsigned long currTime);
+Customer *getCustomerWithinTimeWithMinItems(Queue *pQueue, unsigned long currTime);
 
 int main() {
     char* inputFile = "in.txt";
@@ -56,23 +59,23 @@ int main() {
         queues[i].back = NULL;
     }
 
-    ifstream fin(inputFile);
+    FILE *fin = fopen(inputFile, "r");
     FILE *fptr = fopen(outFile, "w");
 
     int testcases;
-    fin >> testcases;
+    fscanf(fin, "%d", &testcases);
 
     while(testcases > 0){
         int customers;
-        fin >> customers;
+        fscanf(fin, "%d", &customers);
 
         for(int i=0; i<customers; i++) {
             unsigned long inTime;
             unsigned long line;
-            string name;
+            char* name = (char*) malloc(MAX_NAME_LEN * sizeof(char));
             unsigned int items;
 
-            fin >> inTime >> line >> name >> items;
+            fscanf(fin, "%lu %lu %s %d\n", &inTime, &line, name, &items);
             line--;
             enqueue(queues, createCustomer(inTime, line, name, items));
         }
@@ -86,7 +89,7 @@ int main() {
     return 0;
 }
 
-void runSimulation(queue *pQueue, FILE *pFile) {
+void runSimulation(Queue *pQueue, FILE *pFile) {
     unsigned long currentTime = 0;
 
     Customer *c = getNextCustomer(pQueue, &currentTime);
@@ -109,7 +112,7 @@ void checkoutCustomer(Customer *pCustomer, unsigned long *currTime) {
     printf("%s from line %lu checks out at time %lu.\n", pCustomer->name, pCustomer->lineId+1, *currTime);
 }
 
-Customer *getNextCustomer(queue *pQueue, unsigned long *currTime) {
+Customer *getNextCustomer(Queue *pQueue, unsigned long *currTime) {
     Customer *c = getCustomerWithinTimeWithMinItems(pQueue, *currTime);
 
     if(c == NULL) {
@@ -121,7 +124,7 @@ Customer *getNextCustomer(queue *pQueue, unsigned long *currTime) {
     return c;
 }
 
-Customer *getCustomerWithinTimeWithMinItems(queue *pQueue, unsigned long currTime) {
+Customer *getCustomerWithinTimeWithMinItems(Queue *pQueue, unsigned long currTime) {
     int minIdx = -1;
     int minItems = MAX_ITEMS + 10;
     int found = 0;
@@ -154,7 +157,7 @@ Customer *getCustomerWithinTimeWithMinItems(queue *pQueue, unsigned long currTim
     return c;
 }
 
-Customer *getCustomerWithMinInTime(queue *pQueue) {
+Customer *getCustomerWithMinInTime(Queue *pQueue) {
     int minIdx;
     unsigned long minInTime = MAX_IN_TIME;
     int found = 0;
@@ -191,7 +194,7 @@ void enqueue(Queue *pQueue, Customer *pCustomer) {
     n->customer = pCustomer;
     n->next = NULL;
 
-    if(empty(pQueue[pCustomer->lineId])){
+    if(queueEmpty(pQueue[pCustomer->lineId])){
         pQueue[pCustomer->lineId].front = n;
         pQueue[pCustomer->lineId].back = n;
     }
@@ -201,17 +204,17 @@ void enqueue(Queue *pQueue, Customer *pCustomer) {
     }
 }
 
-bool empty(Queue queue) {
+int queueEmpty(Queue queue) {
     return (queue.front == NULL && queue.back == NULL);
 }
 
-Customer *createCustomer(unsigned long time, unsigned long line, string name, unsigned int items) {
+Customer *createCustomer(unsigned long time, unsigned long line, char *name, unsigned int items) {
     Customer *c = (Customer*) malloc(sizeof(Customer));
     c->inTime = time;
     c->lineId = line;
 
     c->name = (char*) malloc(MAX_NAME_LEN * sizeof(char));
-    sprintf(c->name, "%s", name.c_str());
+    sprintf(c->name, "%s", name);
 
     c->items = items;
 
