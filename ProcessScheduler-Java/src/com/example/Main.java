@@ -7,11 +7,19 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String args[]){
+        System.out.println("Running fixed testcases:");
         ArrayList<String> testcases = getTestcasesFromFile("input.txt");
         for(String t : testcases) {
             Scheduler s = new Scheduler(t);
             s.execute();
         }
+
+        // Randomized processes
+        System.out.println("\n\n\nRunning randomized testcases:");
+        Scheduler s = new Scheduler(true);
+        s.addNewProcessesToWaiting(20);
+        s.moveProcessesFromWaitingToSleeping();
+        s.execute();
     }
 
     private static ArrayList<String> getTestcasesFromFile(String inputFile) {

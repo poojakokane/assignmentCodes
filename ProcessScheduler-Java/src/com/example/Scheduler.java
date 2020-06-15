@@ -1,8 +1,5 @@
 package com.example;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,13 +14,18 @@ public class Scheduler {
 
     private int cyclesToRun;
 
+    private int lastProcId;
+
     public Scheduler(String inputString) {
+        lastProcId = 0;
+
         String[] processes;
         processes = inputString.split(";");
 
         sleeipngQueue = new LinkedList<SchedulerProcess>();
         for(String p : processes){
             this.sleeipngQueue.addLast(new SchedulerProcess(p));
+            lastProcId++;
         }
 
         randomized = false;
@@ -40,6 +42,22 @@ public class Scheduler {
         runningQueue = new LinkedList<SchedulerProcess>();
         waitingQueue = new LinkedList<SchedulerProcess>();
         completedList = new LinkedList<SchedulerProcess>();
+
+    }
+
+    public Scheduler(boolean random) {
+        randomized = random;
+        sleeipngQueue = new LinkedList<SchedulerProcess>();
+        runningQueue = new LinkedList<SchedulerProcess>();
+        waitingQueue = new LinkedList<SchedulerProcess>();
+        completedList = new LinkedList<SchedulerProcess>();
+
+        resourceAvailable = new HashMap<String, Boolean>();
+        resourceAvailable.putIfAbsent("A", true);
+        resourceAvailable.putIfAbsent("B", true);
+        resourceAvailable.putIfAbsent("C", true);
+
+        cyclesToRun = 0;
     }
 
     public void execute() {
@@ -52,9 +70,21 @@ public class Scheduler {
             moveProcessesFromSleepingToRunning();
 
             // will be used in Part B
-            addNewProcessesToWaiting();
+            if(randomized) {
+                addNewProcessesToWaiting(2);
+            }
 
             cyclesToRun++;
+
+            if(cyclesToRun % 100 == 0){
+                System.out.println("Length of processes at cycle " + cyclesToRun + ": "
+                + sleeipngQueue.size());
+            }
+
+            if(cyclesToRun >= 1000){
+                System.out.println("Not completed after 1000 cycles, breaking!");
+                return;
+            }
         }
 
         System.out.println("Cycles to complete : " + cyclesToRun);
@@ -69,8 +99,12 @@ public class Scheduler {
         }
     }
 
-    private void addNewProcessesToWaiting() {
-
+    public void addNewProcessesToWaiting(int numProcessesToAdd) {
+        while(numProcessesToAdd > 0){
+            waitingQueue.addLast(new SchedulerProcess(true, lastProcId));
+            numProcessesToAdd--;
+            lastProcId++;
+        }
     }
 
     private void moveProcessesFromSleepingToRunning() {
@@ -94,7 +128,9 @@ public class Scheduler {
         return true;
     }
 
-    private void moveProcessesFromWaitingToSleeping() {
-
+    public void moveProcessesFromWaitingToSleeping() {
+        while(!waitingQueue.isEmpty()){
+            sleeipngQueue.addLast(waitingQueue.removeFirst());
+        }
     }
 }
