@@ -9,14 +9,8 @@ int main(int argc, char *argv[]) {
         printf("File name parameter is missing in arguments. Usage : newfile <fileName> [content]\n");
         return -1;
     }
-    // //open the file for writing to
-    // FILE *outputFile = fopen(argv[1], "w"); //***CANT USE FILE STRUCT OR FOPEN!!!***
-    // //check if file is opened successfully for writing
-    // if (outputFile == NULL) {
-    //     printf("Error! File name supplied could not be opened for writing.");
-    //     return -1;
-    // }
-    int outputFile = open(argv[1], O_WRONLY | O_CREAT);
+
+    int outputFile = open(argv[1], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (outputFile == -1) {
         printf("Error! File name supplied could not be opened for writing.");
         return -1;
@@ -25,7 +19,7 @@ int main(int argc, char *argv[]) {
     //loop through all the remaining arguments
     //and output them to the file
     for (int i = 2; i < argc; i++) {
-        write(outputFile, argv[i], strlen(argv[1]));
+        write(outputFile, argv[i], strlen(argv[i]));
         write(outputFile, " ", 1);
     }
     //close the file
