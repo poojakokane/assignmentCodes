@@ -1,4 +1,4 @@
-#Sample output
+# Sample output
 
 ```bash
 pi@hogwarts:/tmp/tmp.KiPhRgSkEU/cmake-build-debug $ ./Shapes_cpp
