@@ -38,13 +38,20 @@ Ticket::Ticket(int _client_type) {
 
 int Ticket::getPriority(){
     //complete
+    return this->priority;
 }
 
 void Ticket::setPriority(int _priority){
     //complete
+    this->priority = _priority;
 }
 
 std::string Ticket::getClientType() {
     //complete
+    return this->clientType;
+}
+
+void Ticket::setClientType(std::string clientType) {
+    this->clientType = clientType;
 }
 

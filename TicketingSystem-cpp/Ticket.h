@@ -23,6 +23,7 @@ public:
 
     int getPriority();
     void setPriority(int);
+    void setClientType(std::string clientType);
     std::string getClientType();
 
 };
