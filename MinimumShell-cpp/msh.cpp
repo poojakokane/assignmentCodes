@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include <zconf.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 
 #define YOUR_STUDENT_ID "cssc9999"
 
@@ -81,6 +82,13 @@ void forkSingleCommand(vector<string> commandAndArgs, int pipes[][2], int comman
     }
     args[commandAndArgs.size()] = NULL;
 
+    // Check if command is executable
+//    struct stat sb;
+//    if (!(stat(command.c_str(), &sb) == 0 && sb.st_mode & S_IXUSR)){
+//        cout << "The command '" << command << "' is not executable" << endl;
+//        return;
+//    }
+
     if(fork() == 0){
 //        while(dummyFunc()){
 //            sleep(10);
@@ -107,8 +115,10 @@ void forkSingleCommand(vector<string> commandAndArgs, int pipes[][2], int comman
             }
         }
 
-        execvp(command.c_str(), args);
-        exit(0);
+        if (execvp(command.c_str(), args) < 0){
+            cout << "The command '" << command << "' is not executable" << endl;
+            exit(0);
+        }
     }
     else {
         return;
