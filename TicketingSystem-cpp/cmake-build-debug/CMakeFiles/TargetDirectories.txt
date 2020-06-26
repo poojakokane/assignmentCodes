@@ -1,0 +1,3 @@
+/Users/Guest1/CLionProjects/TicketingSystem/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/Guest1/CLionProjects/TicketingSystem/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/Guest1/CLionProjects/TicketingSystem/cmake-build-debug/CMakeFiles/TicketingSystem.dir
