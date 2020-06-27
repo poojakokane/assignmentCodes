@@ -28,7 +28,31 @@ void TicketQueue::insertTicket(Ticket k)
 void TicketQueue::changeTicketPriority(Ticket tkt, int new_priority)
 {
     //complete
-    tkt.setPriority(new_priority);
+    int i;
+    int found = 0;
+    for(i=0; i<heap_size; i++){
+        if(harr[i].getPriority() == tkt.getPriority() && harr[i].getClientType() == tkt.getClientType()){
+            found = 1;
+            break;
+        }
+    }
+
+    if(!found){
+        return;
+    }
+
+    harr[i].setPriority(new_priority);
+    int pid = (i-1)/2;
+
+    if(i == 0){
+        trickleDown(i);
+    } else{
+        if(harr[i].getPriority() < harr[pid].getPriority()){
+            trickleUp(i);
+        } else{
+            trickleDown(i);
+        }
+    }
 }
 
 void  TicketQueue::trickleUp(int i)
